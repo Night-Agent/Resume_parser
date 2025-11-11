@@ -1,0 +1,47 @@
+import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
+import { User } from '../models/User';
+import { asyncHandler, createError } from './errorHandler';
+
+interface AuthenticatedRequest extends Request {
+  user?: any;
+}
+
+export const protect = asyncHandler(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  let token;
+
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (!token) {
+    throw createError('Not authorized to access this route', 401);
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
+    req.user = await User.findById(decoded.id);
+    
+    if (!req.user) {
+      throw createError('No user found with this token', 404);
+    }
+
+    next();
+  } catch (error) {
+    throw createError('Not authorized to access this route', 401);
+  }
+});
+
+export const authorize = (...roles: string[]) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      throw createError('User not authenticated', 401);
+    }
+
+    if (!roles.includes(req.user.role)) {
+      throw createError(`User role ${req.user.role} is not authorized to access this route`, 403);
+    }
+
+    next();
+  };
+};

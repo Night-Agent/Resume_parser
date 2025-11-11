@@ -1,0 +1,26 @@
+{
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.preferences.includePathProposals": true,
+  "typescript.workspaceSymbols.scope": "allOpenProjects",
+  "typescript.validate.enable": true,
+  "typescript.format.enable": true,
+  "typescript.suggest.enabled": true,
+  "files.associations": {
+    "*.ts": "typescript",
+    "*.css": "tailwindcss"
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.git": true,
+    "**/backup-all": true
+  },
+  "typescript.preferences.verbatimModuleSyntax": false,
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false,
+  "css.lint.unknownAtRules": "ignore",
+  "scss.lint.unknownAtRules": "ignore"
+}

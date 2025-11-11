@@ -1,0 +1,339 @@
+# ==========================================
+# Resume Parser - Git Ignore Configuration
+# ==========================================
+
+# ============ Operating System ============
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ============ IDEs & Editors ============
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+.history/
+*.vsix
+
+# JetBrains IDEs (WebStorm, IntelliJ, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# ============ Node.js ============
+# Dependencies
+node_modules/
+jspm_packages/
+bower_components/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Testing
+coverage/
+.nyc_output/
+lib-cov/
+.grunt/
+.lock-wscript
+
+# Compiled files
+build/
+dist/
+.cache/
+.parcel-cache/
+.next/
+out/
+.nuxt/
+.vuepress/dist
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.yarn/
+.pnp.*
+
+# ============ TypeScript ============
+*.tsbuildinfo
+*.d.ts.map
+
+# ============ Environment Variables ============
+# IMPORTANT: Never commit sensitive data!
+.env
+.env.*
+!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# ============ Database ============
+# MongoDB
+*.mongodb
+data/
+db/
+*.db
+*.sqlite
+*.sqlite3
+
+# Redis
+dump.rdb
+
+# ============ File Uploads ============
+uploads/
+temp/
+tmp/
+*.tmp
+
+# Uploaded files
+*.pdf
+*.doc
+*.docx
+!sample.pdf
+!example.pdf
+
+# ============ Build & Compiled Files ============
+# Frontend (React)
+frontend/build/
+frontend/.cache/
+frontend/dist/
+
+# Backend (TypeScript)
+backend/dist/
+backend/build/
+backend/compiled/
+
+# ============ Python ============
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+.Python
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.pytest_cache/
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# pyenv
+.python-version
+
+# Spacy models (optional - comment out if you want to commit them)
+# *.spacy
+
+# ============ AWS & Cloud ============
+# AWS credentials
+.aws/
+*.pem
+*.key
+*.crt
+*.cer
+
+# Serverless Framework
+.serverless/
+
+# ============ Docker ============
+# Docker files (optional - uncomment if not needed)
+# docker-compose.override.yml
+# Dockerfile.dev
+
+# ============ Blockchain ============
+# Ethereum/Hardhat
+cache/
+artifacts/
+.openzeppelin/
+deployments/
+
+# Private keys (CRITICAL!)
+*.secret
+*.private
+wallet.json
+keystore/
+
+# ============ Archives & Backups ============
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+backup/
+backups/
+backup-*/
+*.bak
+*.backup
+*.old
+
+# ============ Misc ============
+# Security scanning
+.snyk
+
+# Thumbnails
+._*
+
+# Files that might appear in root
+.DS_Store
+.Spotlight-V100
+.Trashes
+
+# Temporary files
+*.swp
+*.swo
+*~
+.tmp/
+
+# Project specific
+textfiles/
+docs/old/
+saas-frontend/
+backup-all/
+
+# Demo files (optional)
+demo-*.js
+complete-system-demo.js
+
+# Batch scripts (optional - uncomment if you want to commit them)
+# *.bat
+# *.sh
+
+# Documentation builds
+site/
+_site/
+
+# ============ Security & Secrets ============
+# Never commit these!
+secrets/
+*.secret
+.secrets
+credentials.json
+serviceAccountKey.json
+firebase-adminsdk.json
+
+# API Keys file
+api-keys.txt
+keys.json
+
+# SSL Certificates
+*.pem
+*.key
+*.crt
+*.csr
+*.der
+*.p12
+*.pfx
+
+# ============ CI/CD ============
+# GitHub Actions (keep workflows)
+# .github/workflows/
+
+# ============ Comments for Team ============
+# Add your environment-specific files below:
+# Example: /my-local-config.json

@@ -1,0 +1,105 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "🚀 Run Ultimate AI Resume Platform",
+			"type": "shell",
+			"command": "cd frontend && npm start",
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Build Revolutionary AI Resume Engine",
+			"type": "shell",
+			"command": "npm run build",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build Backend",
+			"type": "shell",
+			"command": "cd backend && npm run build",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Launch Revolutionary AI Backend",
+			"type": "shell",
+			"command": "cd backend && npm start",
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Launch Revolutionary AI Frontend",
+			"type": "shell",
+			"command": "cd frontend && npm start",
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Start Frontend Development Server",
+			"type": "shell",
+			"command": "cd frontend && npm start",
+			"isBackground": true,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Install Backend Dependencies",
+			"type": "shell",
+			"command": "cd backend && npm install",
+			"isBackground": false,
+			"problemMatcher": [
+				"$node-sass"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Install Frontend Dependencies",
+			"type": "shell",
+			"command": "cd frontend && npm install",
+			"isBackground": false,
+			"problemMatcher": [
+				"$node-sass"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build Backend",
+			"type": "shell",
+			"command": "cd backend && npm run build",
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Start Backend Server",
+			"type": "shell",
+			"command": "cd backend && npm run dev",
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "Start Frontend Server",
+			"type": "shell",
+			"command": "cd frontend && npm start",
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "test"
+		}
+	]
+}

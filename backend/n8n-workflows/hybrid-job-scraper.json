@@ -1,0 +1,239 @@
+{
+  "name": "Hybrid Job Scraper Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "job-search",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Job Search Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "job-search"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract parameters from webhook\nconst skills = $json.skills || [];\nconst location = $json.location || 'India';\nconst role = $json.role || '';\n\n// Create search queries for different sites\nconst queries = {\n  indeed: `${skills.join(' ')} ${role} in ${location}`,\n  linkedin: `${skills.join(' OR ')} ${location}`,\n  glassdoor: `${role} ${skills[0]} ${location}`,\n  naukri: `${skills.join(', ')} in ${location}`\n};\n\nreturn {\n  skills,\n  location,\n  role,\n  queries,\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "prepare-queries",
+      "name": "Prepare Search Queries",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://indeed.com/jobs?q={{$json.queries.indeed}}",
+        "responseFormat": "text",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "scrape-indeed",
+      "name": "Scrape Indeed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "url": "=https://www.linkedin.com/jobs/search/?keywords={{$json.queries.linkedin}}",
+        "responseFormat": "text",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "scrape-linkedin",
+      "name": "Scrape LinkedIn",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://www.glassdoor.com/Job/jobs.htm?sc.keyword={{$json.queries.glassdoor}}",
+        "responseFormat": "text",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "scrape-glassdoor",
+      "name": "Scrape Glassdoor",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Parse Indeed HTML\nconst html = $json.data;\nconst jobs = [];\n\n// Simple regex parsing (in production, use cheerio/jsdom)\nconst titleMatches = html.match(/<h2[^>]*data-jk[^>]*>([^<]+)<\\/h2>/g) || [];\nconst companyMatches = html.match(/<span class=\"companyName\"[^>]*>([^<]+)<\\/span>/g) || [];\nconst locationMatches = html.match(/<div[^>]*data-testid=\"job-location\"[^>]*>([^<]+)<\\/div>/g) || [];\nconst salaryMatches = html.match(/<span[^>]*salary[^>]*>([^<]+)<\\/span>/g) || [];\n\nfor (let i = 0; i < Math.min(titleMatches.length, 20); i++) {\n  const title = titleMatches[i]?.replace(/<[^>]*>/g, '').trim();\n  const company = companyMatches[i]?.replace(/<[^>]*>/g, '').trim();\n  const location = locationMatches[i]?.replace(/<[^>]*>/g, '').trim();\n  const salary = salaryMatches[i]?.replace(/<[^>]*>/g, '').trim();\n  \n  if (title && company) {\n    jobs.push({\n      title,\n      company,\n      location: location || 'Not specified',\n      salary: salary || null,\n      description: `${title} position at ${company}`,\n      url: `https://indeed.com/viewjob?jk=sample_${i}`,\n      source: 'indeed_n8n',\n      postedDate: new Date().toISOString(),\n      logo: `https://logo.clearbit.com/${company.toLowerCase().replace(/\\s+/g, '')}.com`\n    });\n  }\n}\n\nreturn { jobs, source: 'indeed', count: jobs.length };"
+      },
+      "id": "parse-indeed",
+      "name": "Parse Indeed Jobs",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Parse LinkedIn HTML\nconst html = $json.data;\nconst jobs = [];\n\n// LinkedIn job parsing\nconst jobCards = html.match(/<li[^>]*class=\"[^\"]*job-search-card[^\"]*\"[^>]*>[\\s\\S]*?<\\/li>/g) || [];\n\nfor (let i = 0; i < Math.min(jobCards.length, 20); i++) {\n  const card = jobCards[i];\n  \n  const titleMatch = card.match(/<h3[^>]*>[^<]*<a[^>]*>([^<]+)<\\/a>[^<]*<\\/h3>/);\n  const companyMatch = card.match(/<h4[^>]*class=\"[^\"]*base-search-card__subtitle[^\"]*\"[^>]*>([^<]+)<\\/h4>/);\n  const locationMatch = card.match(/<span[^>]*class=\"[^\"]*job-search-card__location[^\"]*\"[^>]*>([^<]+)<\\/span>/);\n  \n  const title = titleMatch?.[1]?.trim();\n  const company = companyMatch?.[1]?.trim();\n  const location = locationMatch?.[1]?.trim();\n  \n  if (title && company) {\n    jobs.push({\n      title,\n      company,\n      location: location || 'Remote',\n      description: `${title} role at ${company} - LinkedIn opportunity`,\n      url: `https://linkedin.com/jobs/view/sample_${i}`,\n      source: 'linkedin_n8n',\n      postedDate: new Date().toISOString(),\n      logo: `https://logo.clearbit.com/${company.toLowerCase().replace(/\\s+/g, '')}.com`\n    });\n  }\n}\n\nreturn { jobs, source: 'linkedin', count: jobs.length };"
+      },
+      "id": "parse-linkedin",
+      "name": "Parse LinkedIn Jobs",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Parse Glassdoor HTML\nconst html = $json.data;\nconst jobs = [];\n\n// Glassdoor job parsing\nconst titleMatches = html.match(/<a[^>]*data-test=\"job-title\"[^>]*>([^<]+)<\\/a>/g) || [];\nconst companyMatches = html.match(/<span[^>]*data-test=\"employer-name\"[^>]*>([^<]+)<\\/span>/g) || [];\nconst locationMatches = html.match(/<span[^>]*data-test=\"job-location\"[^>]*>([^<]+)<\\/span>/g) || [];\nconst salaryMatches = html.match(/<span[^>]*data-test=\"detailSalary\"[^>]*>([^<]+)<\\/span>/g) || [];\n\nfor (let i = 0; i < Math.min(titleMatches.length, 15); i++) {\n  const title = titleMatches[i]?.replace(/<[^>]*>/g, '').trim();\n  const company = companyMatches[i]?.replace(/<[^>]*>/g, '').trim();\n  const location = locationMatches[i]?.replace(/<[^>]*>/g, '').trim();\n  const salary = salaryMatches[i]?.replace(/<[^>]*>/g, '').trim();\n  \n  if (title && company) {\n    jobs.push({\n      title,\n      company,\n      location: location || 'Various',\n      salary: salary || null,\n      description: `${title} position at ${company} with competitive salary`,\n      url: `https://glassdoor.com/job-listing/sample_${i}`,\n      source: 'glassdoor_n8n',\n      postedDate: new Date().toISOString(),\n      logo: `https://logo.clearbit.com/${company.toLowerCase().replace(/\\s+/g, '')}.com`\n    });\n  }\n}\n\nreturn { jobs, source: 'glassdoor', count: jobs.length };"
+      },
+      "id": "parse-glassdoor",
+      "name": "Parse Glassdoor Jobs",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [900, 400]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Merge all job results\nconst indeedJobs = $('parse-indeed').first()?.json?.jobs || [];\nconst linkedinJobs = $('parse-linkedin').first()?.json?.jobs || [];\nconst glassdoorJobs = $('parse-glassdoor').first()?.json?.jobs || [];\n\n// Combine all jobs\nconst allJobs = [\n  ...indeedJobs,\n  ...linkedinJobs,\n  ...glassdoorJobs\n];\n\n// Add metadata\nconst result = {\n  jobs: allJobs,\n  metadata: {\n    totalJobs: allJobs.length,\n    sources: {\n      indeed: indeedJobs.length,\n      linkedin: linkedinJobs.length,\n      glassdoor: glassdoorJobs.length\n    },\n    scrapedAt: new Date().toISOString(),\n    query: $('prepare-queries').first()?.json || {}\n  },\n  success: true\n};\n\nreturn result;"
+      },
+      "id": "merge-results",
+      "name": "Merge All Results",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}"
+      },
+      "id": "respond",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "Job Search Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Search Queries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Search Queries": {
+      "main": [
+        [
+          {
+            "node": "Scrape Indeed",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Scrape LinkedIn",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Scrape Glassdoor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Indeed": {
+      "main": [
+        [
+          {
+            "node": "Parse Indeed Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Parse LinkedIn Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Glassdoor": {
+      "main": [
+        [
+          {
+            "node": "Parse Glassdoor Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Indeed Jobs": {
+      "main": [
+        [
+          {
+            "node": "Merge All Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse LinkedIn Jobs": {
+      "main": [
+        [
+          {
+            "node": "Merge All Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Glassdoor Jobs": {
+      "main": [
+        [
+          {
+            "node": "Merge All Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge All Results": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "createdAt": "2025-09-13T00:00:00.000Z",
+  "updatedAt": "2025-09-13T00:00:00.000Z",
+  "id": "hybrid-job-scraper",
+  "tags": []
+}
